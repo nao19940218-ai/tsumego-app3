@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイ詰碁作成＆クイズアプリ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+        <h1 id="app-title">詰碁アプリ</h1>
+        
+        <!-- モード切り替えタブ -->
+        <div style="margin-bottom: 15px;">
+            <button id="btn-play-mode" style="font-weight:bold; padding: 8px 16px;">🔥 問題を解く</button>
+            <button id="btn-edit-mode" style="padding: 8px 16px;">🛠️ 問題を作る</button>
+        </div>
+
+        <!-- 問題切り替え ＆ ジャンプ機能 -->
+        <div style="margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <div>
+                <button id="btn-prev">◀ 前へ</button>
+                <span id="question-number" style="margin: 0 10px; font-weight: bold;">問題 1 / 180</span>
+                <button id="btn-next">次へ ▶</button>
+            </div>
+            <!-- ジャンプ用フォーム -->
+            <div style="font-size: 14px;">
+                <input type="number" id="input-jump" min="1" max="180" placeholder="10" style="width: 50px; text-align: center; padding: 3px;"> 問目へ
+                <button id="btn-jump" style="padding: 3px 8px;">移動</button>
+            </div>
+        </div>
+
+        <!-- 作成モード専用のツールバー -->
+        <div id="edit-toolbar" style="display: none; margin-bottom: 15px; background: #ddd; padding: 10px; border-radius: 5px;">
+            <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: bold;">【配置する石・設定を選択】</p>
+            <label><input type="radio" name="stone-select" value="black" checked> ●黒石(初期)</label>
+            <label><input type="radio" name="stone-select" value="white"> ◯白石(初期)</label>
+            <label><input type="radio" name="stone-select" value="correct"> 🎯1手目の正解地点</label>
+            <label><input type="radio" name="stone-select" value="clear"> ✕消しゴム</label>
+            <button id="btn-save" style="margin-left: 15px; background: #4CAF50; color: white; border: none; padding: 5px 15px; font-weight: bold; cursor: pointer;">問題を保存</button>
+        </div>
+
+        <!-- 碁盤 -->
+        <div id="board-container">
+            <div id="board"></div>
+        </div>
+
+        <p id="status">ステータス</p>
+        <button id="btn-reset" style="padding: 5px 10px;">問題をやり直す</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

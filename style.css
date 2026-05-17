@@ -1,0 +1,109 @@
+body {
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f0f0;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+}
+
+#app-container {
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+}
+
+/* 碁盤の外枠（木目調） */
+#board-container {
+    background-color: #dcbc7c;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    display: inline-block;
+}
+
+/* 14路盤のベース */
+#board {
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    grid-template-rows: repeat(14, 1fr);
+    width: 85vw;
+    height: 85vw;
+    max-width: 420px;
+    max-height: 420px;
+    position: relative;
+    border-top: 1px solid #000;
+    border-right: 1px solid #000;
+}
+
+/* 各マス目 */
+.intersection {
+    position: relative;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* 横線 */
+.intersection::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #000;
+    z-index: 1;
+}
+
+/* 縦線 */
+.intersection::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 100%;
+    background-color: #000;
+    z-index: 1;
+}
+
+/* 上と右をはみ出させないルール */
+#board .intersection:nth-child(-n+14)::after {
+    top: 50%;
+    height: 50%;
+}
+#board .intersection:nth-child(14n)::before {
+    width: 50%;
+}
+
+/* ─── ✨ 星（黒い点）を配置する正しい設定 ✨ ─── */
+/* JavaScript側で各マスに付けているID（cell-行-列）を利用してピンポイントで指定します */
+#board #cell-3-4, #board #cell-3-10,
+#board #cell-9-4, #board #cell-9-10 {
+    /* 交差点の真ん中に綺麗な直径5pxほどの黒丸を表示します */
+    background-image: radial-gradient(circle, #000 20%, transparent 25%);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+/* 石の見た目（十字の交差点の真上） */
+.stone {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 95%;
+    height: 95%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: 1px 2px 3px rgba(0,0,0,0.3);
+}
+
+.black {
+    background: radial-gradient(circle at 30% 30%, #555, #000);
+}
+
+.white {
+    background: radial-gradient(circle at 30% 30%, #fff, #ccc);
+    border: 1px solid #aaa;
+}
