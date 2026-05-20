@@ -53,6 +53,15 @@
             <button id="btn-connect-db" style="padding: 5px 10px; background: #ffc107; border: none; cursor: pointer; font-weight: bold; border-radius: 3px;">接続</button>
             <span id="db-status" style="display: block; margin-top: 5px; font-size: 12px; color: #856404;">⚠️ 接続していません（ローカル保存中）</span>
         </div>
+
+        <div style="margin-top: 20px; background: #e2e3e5; padding: 10px; border-radius: 5px; border: 1px solid #ced4da; font-size: 14px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">📦 全180問データのバックアップ・引越し</label>
+            <div style="margin-bottom: 8px;">
+                <button id="btn-export" style="padding: 5px 10px; background: #17a2b8; color: white; border: none; cursor: pointer; border-radius: 3px; font-weight: bold;">データを書き出す (Export)</button>
+                <button id="btn-import" style="padding: 5px 10px; background: #dc3545; color: white; border: none; cursor: pointer; border-radius: 3px; font-weight: bold; margin-left: 5px;">データを読み込む (Import)</button>
+            </div>
+            <textarea id="text-data-io" rows="3" placeholder="ここに書き出されたデータが表示されます。読み込む際もここにデータを貼り付けてください。" style="width: 95%; font-size: 11px; padding: 5px; resize: vertical;"></textarea>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

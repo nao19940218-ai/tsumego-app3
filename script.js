@@ -33,6 +33,11 @@ const inputRoomKey = document.getElementById('input-room-key');
 const btnConnectDb = document.getElementById('btn-connect-db');
 const dbStatusText = document.getElementById('db-status');
 
+// インポート・エクスポート用要素
+const btnExport = document.getElementById('btn-export');
+const btnImport = document.getElementById('btn-import');
+const textDataIO = document.getElementById('text-data-io');
+
 const BOARD_SIZE = 14;
 const MAX_QUESTIONS = 180; 
 
@@ -51,7 +56,7 @@ let questionsData = Array(MAX_QUESTIONS).fill(null).map(() => ({
     correctCol: null
 }));
 
-// 前回最後に解いていた（開いていた）問題番号があれば呼び出す
+// 前回最後に解いていた問題番号があれば呼び出す
 const lastOpenedIndex = localStorage.getItem('tsumego_last_opened_index');
 if (lastOpenedIndex !== null) {
     currentQuestionIndex = parseInt(lastOpenedIndex, 10);
@@ -85,7 +90,7 @@ function loadQuestion(index) {
     qNumberText.textContent = `問題 ${index + 1} / ${MAX_QUESTIONS}`;
     inputJump.value = ''; 
     
-    // 現在の番号を「最後に解いた問題」としてスマホに記憶する
+    // 現在の番号をスマホに記憶
     localStorage.setItem('tsumego_last_opened_index', index);
 
     if (currentMode === 'play') {
@@ -291,6 +296,72 @@ btnSave.addEventListener('click', () => {
         });
     } else {
         alert(`問題 ${currentQuestionIndex + 1} を保存しました！`);
+    }
+});
+
+// 📤 エクスポート（180問丸ごと書き出し）機能
+btnExport.addEventListener('click', () => {
+    try {
+        // 180問のデータを1行のテキストに変換
+        const jsonString = JSON.stringify(questionsData);
+        textDataIO.value = jsonString;
+        
+        // テキストエリアを選択して自動コピーを試みる
+        textDataIO.select();
+        textDataIO.setSelectionRange(0, 99999); // スマホ対応
+        navigator.clipboard.writeText(jsonString);
+        
+        alert("全180問のデータを下の枠に出力し、クリップボードにコピーしました！\nメールやメモ帳に貼り付けてバックアップしてください。");
+    } catch (e) {
+        alert("エクスポートに失敗しました。");
+    }
+});
+
+// 📥 インポート（180問丸ごと読み込み）機能
+btnImport.addEventListener('click', () => {
+    const rawData = textDataIO.value.trim();
+    if (!rawData) {
+        alert("下の枠に読み込みたいデータを貼り付けてからボタンを押してください。");
+        return;
+    }
+
+    if (!confirm("⚠️警告：データをインポートすると、現在読み込まれている180問データはすべて上書き（消去）されます。本当によろしいですか？")) {
+        return;
+    }
+
+    try {
+        // テキストを元のデータ構造に復元
+        const parsedData = JSON.parse(rawData);
+        
+        // 簡単な中身チェック（配列かつ180問分あるか）
+        if (!Array.isArray(parsedData) || parsedData.length !== MAX_QUESTIONS) {
+            alert("データの形式が正しくありません。180問分の正しいデータが必要です。");
+            return;
+        }
+
+        questionsData = parsedData;
+
+        // 1. スマホのローカルストレージに即時保存
+        localStorage.setItem('tsumego_14board_questions', JSON.stringify(questionsData));
+
+        // 2. もし合言葉でクラウドに接続中なら、クラウド側も一発で上書き更新
+        if (currentRoomKey) {
+            database.ref('rooms/' + currentRoomKey).set(questionsData)
+            .then(() => {
+                alert("全180問のインポートが完了しました！（クラウドへの自動バックアップも完了）");
+                loadQuestion(0);
+            })
+            .catch(() => {
+                alert("ローカルへのインポートは成功しましたが、クラウド同期に失敗しました。合言葉の接続状態を確認してください。");
+                loadQuestion(0);
+            });
+        } else {
+            alert("全180問のインポートが完了しました！\n（⚠️合言葉で接続していないためスマホ内のみの反映です。クラウドへ送るには一度保存ボタンを押すか、合言葉を繋いでください）");
+            loadQuestion(0);
+        }
+
+    } catch (e) {
+        alert("データの解析に失敗しました。コピーした文字が途中で切れていないか確認してください。");
     }
 });
 
