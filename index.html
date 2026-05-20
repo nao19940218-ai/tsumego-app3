@@ -12,13 +12,6 @@
     <div id="app-container">
         <h1 id="app-title">詰碁アプリ</h1>
         
-        <div style="margin-bottom: 15px; background: #fff3cd; padding: 10px; border-radius: 5px; border: 1px solid #ffeeba; font-size: 14px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 5px;">🔒 クラウド保存用合言葉</label>
-            <input type="password" id="input-room-key" placeholder="例: mytsumego123" style="padding: 5px; width: 140px; text-align: center;">
-            <button id="btn-connect-db" style="padding: 5px 10px; background: #ffc107; border: none; cursor: pointer; font-weight: bold; border-radius: 3px;">接続</button>
-            <span id="db-status" style="display: block; margin-top: 5px; font-size: 12px; color: #856404;">⚠️ 接続していません（ローカル保存中）</span>
-        </div>
-
         <div style="margin-bottom: 15px;">
             <button id="btn-play-mode" style="font-weight:bold; padding: 8px 16px;">🔥 問題を解く</button>
             <button id="btn-edit-mode" style="padding: 8px 16px;">🛠️ 問題を作る</button>
@@ -33,6 +26,9 @@
             <div style="font-size: 14px;">
                 <input type="number" id="input-jump" min="1" max="180" placeholder="10" style="width: 50px; text-align: center; padding: 3px;"> 問目へ
                 <button id="btn-jump" style="padding: 3px 8px;">移動</button>
+            </div>
+            <div>
+                <button id="btn-reset" style="padding: 6px 14px; font-weight: bold; cursor: pointer;">問題をやり直す</button>
             </div>
         </div>
 
@@ -50,7 +46,13 @@
         </div>
 
         <p id="status">ステータス</p>
-        <button id="btn-reset" style="padding: 5px 10px;">問題をやり直す</button>
+
+        <div style="margin-top: 25px; background: #fff3cd; padding: 10px; border-radius: 5px; border: 1px solid #ffeeba; font-size: 14px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">🔒 クラウド保存用合言葉</label>
+            <input type="password" id="input-room-key" placeholder="例: mytsumego123" style="padding: 5px; width: 140px; text-align: center;">
+            <button id="btn-connect-db" style="padding: 5px 10px; background: #ffc107; border: none; cursor: pointer; font-weight: bold; border-radius: 3px;">接続</button>
+            <span id="db-status" style="display: block; margin-top: 5px; font-size: 12px; color: #856404;">⚠️ 接続していません（ローカル保存中）</span>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

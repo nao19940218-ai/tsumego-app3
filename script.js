@@ -1,4 +1,4 @@
-// 送っていただいたFirebaseの鍵を設定
+// Firebaseの鍵を設定
 const firebaseConfig = {
   apiKey: "AIzaSyD1rtbz_LOpqLdRX3xBDvEkh2Zf8gebxP4",
   authDomain: "tsumego-db.firebaseapp.com",
@@ -40,7 +40,7 @@ let currentMode = 'play';
 let currentQuestionIndex = 0; 
 let isFirstMove = true;      
 let currentTurn = 'black';   
-let currentRoomKey = ""; // 現在の合言葉
+let currentRoomKey = ""; 
 
 let boardState = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
 
@@ -51,7 +51,13 @@ let questionsData = Array(MAX_QUESTIONS).fill(null).map(() => ({
     correctCol: null
 }));
 
-// 【重要】合言葉が過去に保存されていたら自動入力
+// 前回最後に解いていた（開いていた）問題番号があれば呼び出す
+const lastOpenedIndex = localStorage.getItem('tsumego_last_opened_index');
+if (lastOpenedIndex !== null) {
+    currentQuestionIndex = parseInt(lastOpenedIndex, 10);
+}
+
+// 合言葉が過去に保存されていたら自動入力
 const savedRoomKey = localStorage.getItem('tsumego_room_key');
 if (savedRoomKey) {
     inputRoomKey.value = savedRoomKey;
@@ -79,6 +85,9 @@ function loadQuestion(index) {
     qNumberText.textContent = `問題 ${index + 1} / ${MAX_QUESTIONS}`;
     inputJump.value = ''; 
     
+    // 現在の番号を「最後に解いた問題」としてスマホに記憶する
+    localStorage.setItem('tsumego_last_opened_index', index);
+
     if (currentMode === 'play') {
         statusText.textContent = "【解くモード】黒番です。1手目を打ってください。";
         statusText.style.color = "black";
@@ -226,38 +235,37 @@ btnConnectDb.addEventListener('click', () => {
     }
     
     currentRoomKey = key;
-    localStorage.setItem('tsumego_room_key', key); // 合言葉をスマホに記憶
+    localStorage.setItem('tsumego_room_key', key); 
     dbStatusText.textContent = "⌛ クラウドデータを読み込み中...";
     dbStatusText.style.color = "blue";
 
-    // Firebaseからデータを1回だけ取得
     database.ref('rooms/' + currentRoomKey).once('value')
     .then((snapshot) => {
         const data = snapshot.val();
         if (data) {
             questionsData = data;
-            // ローカル側にもバックアップ
             localStorage.setItem('tsumego_14board_questions', JSON.stringify(questionsData));
             dbStatusText.textContent = `🟢 クラウドに接続中（合言葉: ${currentRoomKey}）`;
             dbStatusText.style.color = "green";
             alert("クラウドからデータを読み込みました！");
         } else {
-            // クラウドにまだデータがない場合、現在の枠（空の180問）をベースにする
             dbStatusText.textContent = `🟢 新規クラウド枠を作成（合言葉: ${currentRoomKey}）`;
             dbStatusText.style.color = "green";
             alert("新しい合言葉です。これから作る問題はこの合言葉に保存されます。");
         }
+        const lastIndex = localStorage.getItem('tsumego_last_opened_index');
+        currentQuestionIndex = lastIndex !== null ? parseInt(lastIndex, 10) : 0;
         loadQuestion(currentQuestionIndex);
     })
     .catch((error) => {
         console.error(error);
         dbStatusText.textContent = "❌ クラウド接続エラー";
         dbStatusText.style.color = "red";
-        alert("接続に失敗しました。ルール設定などを確認してください。");
+        alert("接続に失敗しました。");
     });
 });
 
-// 保存ボタン（ローカル＋クラウド両方に保存）
+// 保存ボタン
 btnSave.addEventListener('click', () => {
     const q = questionsData[currentQuestionIndex];
     if (!q) return;
@@ -271,20 +279,18 @@ btnSave.addEventListener('click', () => {
         }
     }
 
-    // 1. まずローカル（ブラウザ）に保存
     localStorage.setItem('tsumego_14board_questions', JSON.stringify(questionsData));
 
-    // 2. 合言葉で接続していればクラウドにも自動保存
     if (currentRoomKey) {
         database.ref('rooms/' + currentRoomKey).set(questionsData)
         .then(() => {
             alert(`問題 ${currentQuestionIndex + 1} を保存しました！（クラウド同期完了）`);
         })
         .catch((error) => {
-            alert("ローカルには保存されましたが、クラウドへの同期に失敗しました。");
+            alert("クラウドへの同期に失敗しました。");
         });
     } else {
-        alert(`問題 ${currentQuestionIndex + 1} を保存しました！\n⚠️合言葉が未入力のため、スマホ内のみの保存です。消えないように上の合言葉から「接続」することをおすすめします。`);
+        alert(`問題 ${currentQuestionIndex + 1} を保存しました！`);
     }
 });
 
@@ -310,5 +316,5 @@ btnReset.addEventListener('click', () => loadQuestion(currentQuestionIndex));
 if (savedRoomKey) {
     setTimeout(() => { btnConnectDb.click(); }, 500);
 } else {
-    loadQuestion(0);
+    loadQuestion(currentQuestionIndex);
 }
